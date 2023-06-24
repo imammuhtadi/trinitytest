@@ -12,32 +12,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late UserProvider _userProvider;
+  late UserProvider userProvider;
 
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
-    _userProvider = UserProvider();
-    _userProvider.getUsers();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (BuildContext context) => _userProvider,
-      builder: (context, child) => _buildPage(context),
-    );
+    Provider.of<UserProvider>(context, listen: false).getUsers();
   }
 
   Future<dynamic> _refresh() async {
     await Future.delayed(const Duration(seconds: 1));
-    return _userProvider.getUsers();
+    return userProvider.getUsers();
   }
 
-  Widget _buildPage(BuildContext context) {
-    final userState = Provider.of<UserProvider>(context).state;
+  @override
+  Widget build(BuildContext context) {
+    userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -68,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisSpacing: 20,
             mainAxisSpacing: 20,
           ),
-          itemCount: userState.users.length,
+          itemCount: userProvider.state.users.length,
           itemBuilder: (BuildContext ctx, index) {
             return Container(
               alignment: Alignment.center,
@@ -81,13 +73,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   CircleAvatar(
                     radius: 26,
                     child: Text(
-                      '${userState.users[index].firstName![0].toUpperCase()}${userState.users[index].lastName![0].toUpperCase()}',
+                      '${userProvider.state.users[index].firstName![0].toUpperCase()}${userProvider.state.users[index].lastName![0].toUpperCase()}',
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${userState.users[index].firstName} ${userState.users[index].lastName}',
+                    '${userProvider.state.users[index].firstName} ${userProvider.state.users[index].lastName}',
                   ),
                 ],
               ),
